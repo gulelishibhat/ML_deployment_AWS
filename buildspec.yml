@@ -1,5 +1,3 @@
-version: 0.2
-
 phases:
   pre_build:
     commands:
@@ -7,10 +5,13 @@ phases:
       - aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 772428488343.dkr.ecr.us-west-2.amazonaws.com
   build:
     commands:
-      - echo Build Docker image...
+      - echo "Listing files in build context"
+      - ls -la
+      - echo "Building Docker image"
       - docker build -t diabetes-inference .
       - docker tag diabetes-inference:latest 772428488343.dkr.ecr.us-west-2.amazonaws.com/ml-inference:latest
   post_build:
     commands:
-      - echo Pushing Docker image to ECR...
+      - echo "Pushing Docker image to ECR"
       - docker push 772428488343.dkr.ecr.us-west-2.amazonaws.com/ml-inference:latest
+
