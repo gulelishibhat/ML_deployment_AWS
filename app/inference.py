@@ -1,14 +1,11 @@
-# inference.py
-import joblib
-import pandas as pd
+import pickle
+import numpy as np
 
-# Load the model
-model = joblib.load("../model/diabetes_prediction_model.pkl")
+class ModelWrapper:
+    def __init__(self, model_path="diabetes_prediction_model.pkl"):
+        with open(model_path, "rb") as f:
+            self.model = pickle.load(f)
 
-def predict(input_data: dict):
-    """
-    input_data: dict of features, e.g., {"age": 50, "bmi": 28.5, "gender": 1}
-    """
-    df = pd.DataFrame([input_data])
-    preds = model.predict(df)
-    return preds.tolist()
+    def predict(self, features):
+        features = np.array(features).reshape(1, -1)
+        return self.model.predict(features)[0]

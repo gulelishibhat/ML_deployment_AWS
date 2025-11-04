@@ -4,14 +4,21 @@ FROM python:3.10-slim
 # Set working directory
 WORKDIR /app
 
-# Copy app files
-COPY . /app
+# Install system dependencies
+RUN apt-get update && apt-get install -y build-essential gcc && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies
+# Copy app files
+COPY app/ /app
+
+# Copy model files
+COPY model/ /app/model
+
+# Upgrade pip and install dependencies
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose port
 EXPOSE 8080
 
-# Command to run the web server
+# Run the API
 CMD ["python", "main.py"]
