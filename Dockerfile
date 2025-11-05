@@ -1,24 +1,14 @@
-# Base image
-FROM public.ecr.aws/docker/library/python:3.10-slim
+# Base image for Python 3.10 Lambda
+FROM public.ecr.aws/lambda/python:3.10
 
-# Set working directory
-WORKDIR /app
+# Copy function code
+COPY app/ ${LAMBDA_TASK_ROOT}/
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y build-essential gcc && rm -rf /var/lib/apt/lists/*
+# Copy model
+COPY model/ ${LAMBDA_TASK_ROOT}/model
 
-# Copy app files
-COPY app/ /app
+# Install dependencies
+RUN pip install --no-cache-dir -r ${LAMBDA_TASK_ROOT}/requirements.txt
 
-# Copy model files
-COPY model/ /app/model
-
-# Upgrade pip and install dependencies
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Expose port
-EXPOSE 8080
-
-# Run the API
-CMD ["python", "main.py"]
+# Command to run the Lambda handler
+CMD ["main.lambda_handler"]

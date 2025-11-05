@@ -1,14 +1,17 @@
-from flask import Flask, request, jsonify
 from inference import ModelWrapper
 
-app = Flask(__name__)
+# Load your model once — Lambda reuses the same container for multiple invocations
 model = ModelWrapper()
 
-@app.route("/predict", methods=["POST"])
-def predict():
-    data = request.get_json()
-    prediction = model.predict(data["features"])
-    return jsonify({"prediction": int(prediction)})
+def lambda_handler(event, context):
+    try:
+        # Expecting a JSON input: {"features": [...]}
+        features = event.get("features")
+        if not features:
+            return {"error": "Missing 'features' in input"}
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080)
+        prediction = model.predict(features)
+        return {"prediction": int(prediction)}
+
+    except Exception as e:
+        return {"error": str(e)}
