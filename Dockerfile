@@ -1,14 +1,18 @@
-# Base image for Python 3.10 Lambda
+# Use AWS Lambda Python 3.10 base image
 FROM public.ecr.aws/lambda/python:3.10
 
-# Copy function code
+# Set the working directory (Lambda uses /var/task)
+WORKDIR /var/task
+
+# Copy your application code
 COPY app/ ${LAMBDA_TASK_ROOT}/
 
-# Copy model
+# Copy your trained model
 COPY model/ ${LAMBDA_TASK_ROOT}/model
 
-# Install dependencies
+# Install Python dependencies
 RUN pip install --no-cache-dir -r ${LAMBDA_TASK_ROOT}/requirements.txt
 
-# Command to run the Lambda handler
+# Set the Lambda handler
 CMD ["main.lambda_handler"]
+
